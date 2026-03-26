@@ -1,47 +1,51 @@
 import { useState } from "react";
+import CampoTexto from "./CampoTexto";
+import GrupoRadio from "./GrupoRadio";
+import Botao from "./Botao";
 
-export default function Tarefas({ nomeTarefa = "", status = " ", }) {
+export default function Tarefas({ nomeTarefa = "", status = "", onAdicionarTarefa }) {
 
-    const [dadosTarefa, setDadosTarefa] = useState({nomeTarefa, status});
+    const [dadosTarefa, setDadosTarefa] = useState({ nomeTarefa, status });
 
-    function handleSubmit(){
-        e.preventDefault();
-        console.log(dadosTarefa)
+    function handleSubmit(e) {
+        e.preventDefault(); // impede que a página recarregue ao enviar o formulário
+
+        if (!dadosTarefa.nomeTarefa.trim()) { // método trim() remove espaços em branco
+            return; // se tiver espaços em branco, o return faz com que a função pare aqui
+        }
+
+        onAdicionarTarefa?.({ // o ?. verifica se variável é diferente de null ou undefined
+            nomeTarefa: dadosTarefa.nomeTarefa.trim(),
+            status: dadosTarefa.status || "pendente",
+        });
+
+        setDadosTarefa({ nomeTarefa: "", status: "" });
     }
 
     return (
         <div>
             <form onSubmit={handleSubmit}>
-                <label htmlFor="nome">Digite a tarefa: </label>
-                <input type="text" 
-                id="nome"
-                value={dadosTarefa.nomeTarefa} 
-                onChange={(t) => setDadosTarefa({ ...dadosTarefa, nomeTarefa: t.target.value })} 
+                <CampoTexto
+                    id="nome"
+                    label="Digite a tarefa: "
+                    value={dadosTarefa.nomeTarefa}
+                    onChange={(t) => setDadosTarefa({ ...dadosTarefa, nomeTarefa: t.target.value })}
                 />
 
-                <p>Digite o status da tarefa:</p>
-
-                <input type="radio" 
-                id="concluido" 
-                name="status" 
-                value="concluido" 
-                checked={dadosTarefa.status === "concluido"}
-                onChange={(t) => setDadosTarefa({...dadosTarefa, status: t.target.value})}
+                <GrupoRadio
+                    titulo="Digite o status da tarefa:"
+                    name="status"
+                    valorSelecionado={dadosTarefa.status}
+                    onChange={(t) => setDadosTarefa({ ...dadosTarefa, status: t.target.value })}
+                    opcoes={[
+                        { id: "concluido", value: "concluido", label: "Concluído" },
+                        { id: "pendente", value: "pendente", label: "Pendente" },
+                    ]}
                 />
-                <label htmlFor="concluido">Concluído</label>
-
-                <input type="radio" 
-                id="pendente" 
-                name="status" 
-                value="pendente" 
-                checked={dadosTarefa.status === "pendente"}
-                onChange={(t) => setDadosTarefa({...dadosTarefa, status: t.target.value})} 
-                />
-                <label htmlFor="pendente">Pendente</label>
                  
                  <br/>
 
-                <button type="submit">Registrar tarefa</button>
+                <Botao type="submit">Registrar tarefa</Botao>
             </form>
         </div>
 
